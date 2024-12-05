@@ -1,0 +1,17 @@
+### GET / HOME PAGE
+GET http://localhost:8383
+
+### GET /dashboard PAGE
+GET http://127.0.0.1:8383/dashboard
+
+### GET /api/data resources
+GET http://localhost:8383/api/data
+
+### POST /api/data add new user
+POST http://localhost:8383/api/data
+Content-Type: application/json
+
+{
+    "name": "Gabi",
+    "age": 11
+}
