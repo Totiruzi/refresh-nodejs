@@ -1,17 +1,47 @@
 ### GET / HOME PAGE
 GET http://localhost:8383
 
-### GET /dashboard PAGE
-GET http://127.0.0.1:8383/dashboard
-
-### GET /api/data resources
-GET http://localhost:8383/api/data
-
-### POST /api/data add new user
-POST http://localhost:8383/api/data
+### POST / REGISTER Page to register a user at auth/register
+POST http://localhost:8383/auth/register
 Content-Type: application/json
 
 {
-    "name": "Gabi",
-    "age": 11
+    "username": "dondadi@gmail.com",
+    "password": "123321"
 }
+
+### POST / LOGIN Page to log  a user in at auth/login
+POST http://localhost:8383/auth/login
+Content-Type: application/json
+
+{
+    "username": "dondadi@gmail.com",
+    "password": "123321"
+}
+
+
+### GET / TODO PAGE (protected)
+GET http://localhost:8383/todos
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzMzNDI3NzQ3LCJleHAiOjE3MzM1MTQxNDd9.HfKEUStL03MIScphP9LLb1MoS52BRopJC_Hv4zqnu3M
+
+### POST / CREATE TODO  (protected)
+POST http://localhost:8383/todos
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzMzNDI3NzQ3LCJleHAiOjE3MzM1MTQxNDd9.HfKEUStL03MIScphP9LLb1MoS52BRopJC_Hv4zqnu3M
+Content-Type: application/json
+
+{
+    "task": "Complete this course with SQLite"
+}
+
+### PUT / UPDATE TODO  (protected)
+PUT http://localhost:8383/todos/2
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzMzNDI3NzQ3LCJleHAiOjE3MzM1MTQxNDd9.HfKEUStL03MIScphP9LLb1MoS52BRopJC_Hv4zqnu3M
+Content-Type: application/json
+
+{
+    "completed": 1
+}
+
+### DELETE / DELETE TODO  (protected)
+DELETE http://localhost:8383/todos/3
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzMzNDI3NzQ3LCJleHAiOjE3MzM1MTQxNDd9.HfKEUStL03MIScphP9LLb1MoS52BRopJC_Hv4zqnu3M
