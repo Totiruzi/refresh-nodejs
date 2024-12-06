@@ -1,34 +1,41 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import database from "../db.js";
+import prisma from "../prismaClient.js";
 
 const router = express.Router();
 
-router.post("/register", (req, res) => {
+router.post("/register", async (req, res) => {
   const { username, password } = req.body;
 
   const passwordHash = bcrypt.hashSync(password);
 
   // Insert the new user into the database
   try {
-    const insertUser = database.prepare(`
-            INSERT INTO users(username,password)
-            VALUES (?, ?)    
-        `);
-    const result = insertUser.run(username, passwordHash);
+    const user = await prisma.user.create({
+      data: {
+        username,
+        password: passwordHash
+      }
+    });
 
     // Define a default todo
     const defaultTodo = "Hi :) add your first todo";
-    const insertTodo = database.prepare(`
-            INSERT INTO todos (user_id, task)
-            VALUES (?, ?)
-        `);
-    insertTodo.run(result.lastInsertRowid, defaultTodo);
+    // const insertTodo = database.prepare(`
+    //         INSERT INTO todos (user_id, task)
+    //         VALUES (?, ?)
+    //     `);
+    // insertTodo.run(result.lastInsertRowid, defaultTodo);
+    await prisma.todo.create({
+      data: {
+        task: defaultTodo,
+        userId: user.id
+      }
+    })
 
     // Create a token
     const token = jwt.sign(
-      { id: result.lastInsertRowid },
+      { id: user.id},
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
@@ -40,12 +47,17 @@ router.post("/register", (req, res) => {
   }
 });
 
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const getUser = database.prepare("SELECT * FROM users WHERE username = ?");
-    const user = getUser.get(username);
+    // const getUser = database.prepare("SELECT * FROM users WHERE username = ?");
+    // const user = getUser.get(username);
+    const user = await prisma.user.findUnique({
+      where: {
+        username: username
+      }
+    })
 
     if (!user) {
       return res.status(404).send({ message: "User not found" });

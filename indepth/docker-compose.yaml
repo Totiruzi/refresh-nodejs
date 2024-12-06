@@ -1,0 +1,31 @@
+version: '3'
+services:
+  app:
+    build: .
+    container_name: todo-app
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/todoapp
+      - JWT_SECRET=lovelyPotatoes
+      - NODE_ENV=development
+      - PORT=8383
+    ports:
+      - "8383:8383"
+    depends_on:
+      - database
+    volumes:
+      - .:/app
+  
+  database:
+    image: postgres:13-alpine
+    container_name: postgres-database
+    environment:
+      POSTGRES_USER: postgres-db
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: todoapp
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:

@@ -1,50 +1,64 @@
 import express from "express";
-import database from "../db.js";
+import prisma from "../prismaClient.js";
 
 const router = express.Router();
 
 // get all todo
-router.get("/", (req, res) => {
-  const getTodos = database.prepare("SELECT * FROM todos WHERE user_id = ?");
-  const todos = getTodos.all(req.userId);
+router.get("/", async (req, res) => {
+  const todos = await prisma.todo.findMany({
+    where: {
+      userId: req.userId
+    }
+  });
+
   res.json(todos);
 });
 
 // create todo
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
   const { task } = req.body;
 
-  const insertTodo = database.prepare(`
-    INSERT INTO todos (user_id, task) VALUES (?, ?)
-  `);
+  const todo = await prisma.todo.create({
+    data: {
+      userId: req.userId,
+      task,
+    }
+  });
 
-  const result = insertTodo.run(req.userId, task);
-
-  res.json({id: result.lastInsertRowid, task, completed: 0});
+  res.json(todo);
 });
 
 // Update todo
-router.put("/:id", (req, res) => {
+router.put("/:id", async (req, res) => {
     const {completed} = req.body;
     const {id} = req.params;
 
-    const updateTodo = database.prepare(`UPDATE todos SET completed = ? WHERE id = ?`);
+    const updateTodo = await prisma.todo.update({
+      where: {
+        id: parseInt(id),
+        userId: req.userId
+      },
+      data: {
+        completed: !!completed
+      }
+    });
 
-    updateTodo.run(completed, id);
-    res.json({message: "To do completed"});
+    res.json(updateTodo);
 });
 
 // delete todo
-router.delete("/:id", (req, res) => {
+router.delete("/:id", async (req, res) => {
     const {id} = req.params;
     const userId = req.userId;
 
-    const deleteTodo = database.prepare(`DELETE FROM todos WHERE id = ? AND user_id = ?`);
+    const deleteTodo = prisma.todo.delete({
+      where: {
+        id: parseInt(id),
+        userId,
+      }
+    });
 
-
-    deleteTodo.run(id, userId);
-
-    res.json({message: "Todo deleted :("});
+    res.json(deleteTodo);
 });
 
 export default router;
